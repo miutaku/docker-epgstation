@@ -27,6 +27,7 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           file: ./epgstation/Dockerfile
+          tags: ${{ steps.meta.outputs.tags }}
           push: true
           platforms: linux/amd64,linux/arm64
           cache-from: type=gha
