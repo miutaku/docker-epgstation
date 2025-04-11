@@ -3,6 +3,8 @@ name: build epgstation for stg
 on:
   push:
     branches: [ "stg" ]
+    paths:
+      - 'epgstation/Dockerfile'
 
 jobs:
   build:
