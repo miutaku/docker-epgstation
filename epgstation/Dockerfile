@@ -11,7 +11,6 @@ RUN apt-get update && \
     apt-get -y install libnuma-dev && \
     apt-get -y install libasound2 libass9 libvdpau1 libva-x11-2 libva-drm2 libxcb-shm0 libxcb-xfixes0 libxcb-shape0 libvorbisenc2 libtheora0 libaribb24-dev && \
 \
-\
 #ffmpeg build
     mkdir /tmp/ffmpeg_sources && \
     cd /tmp/ffmpeg_sources && \
