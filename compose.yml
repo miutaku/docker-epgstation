@@ -1,0 +1,63 @@
+---
+services:
+  epgstation:
+    user: "__UID__:__GID__"
+    container_name: epgstation
+    image: ghcr.io/miutaku/epgstation:latest
+    volumes:
+      - ./epgstation/config:/app/config
+      - ./epgstation/data:/app/data
+      - ./epgstation/logs:/app/logs
+      - ./epgstation/recordedTmp:/app/recordedTmp
+      - nas_recorded:/app/recorded
+      - nas_thumbnail:/app/thumbnail
+      - /var/run:/var/run
+#    privileged: true
+    environment:
+      LANG: "ja_JP.UTF-8"
+      TZ: "Asia/Tokyo"
+    ports:
+      - "8888:8888"
+      - "8889:8889"
+    restart: always
+
+  annict-subscription-scraper:
+    container_name: annict-subscription-scraper
+    image: ghcr.io/miutaku/annict-subscription-scraper:latest
+    restart: always
+
+  cronjob:
+    container_name: crontab
+    image: ghcr.io/miutaku/docker-crontab-arm64:latest
+    volumes:
+      - ./cron/scripts:/scripts
+    environment:
+      CRON: '0 * * * * /scripts/annict-subscription-scraper.sh danime_store'
+
+  node-exporter:
+    container_name: node-exporter
+    image: prom/node-exporter:latest
+    ports:
+      - "9100:9100"
+    command:
+      - '--path.rootfs=/host'
+    pid: host
+    restart: unless-stopped
+    volumes:
+      - '/:/host:ro,rslave'
+
+volumes:
+  nas_recorded:
+    driver_opts:
+      type: cifs
+      o: 'username=__CIFS_USER__,password=__CIFS_PASSWORD__,iocharset=utf8,rw,vers=3.0'
+      device: "//__CIFS_HOST__/recorded"
+  nas_thumbnail:
+    driver_opts:
+      type: cifs
+      o: 'username=__CIFS_USER__,password=__CIFS_PASSWORD__,iocharset=utf8,rw,vers=3.0'
+      device: "//__CIFS_HOST__/thumbnail"
+
+networks:
+  default:
+    name: rec-server
